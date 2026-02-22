@@ -1,38 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/img/favicon.ico" />
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="keywords" content="Pokemon,Pokemon Mega,Pikachu,browser,H5,games">
+    <meta name="description" content="Pokémon Mega Ⅱ is a turn-based browser game highly faithful to anime Pokémon. In this  game, you are a Pokémon trainer to capture, train and upgrade all mega Pokémon(XY&Z). Pokémon can be evolved and will acquire the new skills and higher battle power!" />
     <title>Pokemon Mega Ⅱ</title>
 
-    <script type="text/javascript" src="jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="index.min.js"></script>
-    <script type="text/javascript" src="xdsdk-help.js"></script>
-</head>
-
-<body>
-    <div class="game-container">
-        <div class="game-iframe">  
-            <iframe id="gameIframe" scrolling="no"></iframe>
-            
-            <div class="border">
-                </div>
-        </div>
-    </div>
-
+    <script type="text/javascript" src="./js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript"  src="./js/index.min.js"></script>
+    <!-- <script type="text/javascript"  src="./js/index.js"></script> -->
+    <script type="text/javascript"  src="./js/xdsdk-help.js"></script>
     <script>
-        // Giữ lại logic load Service Worker để đảm bảo game chạy mượt
         window.addEventListener('load', async () => {
+            window.deferredPrompt = null
+            console.log(navigator);
+            // 判断浏览器是否兼容service worker
             if ('serviceWorker' in navigator) {
-                try {
-                    await navigator.serviceWorker.register('/js/sw.js');
-                } catch (e) {
-                    console.log('SW register failed');
-                }
+                console.log('浏览器支持');
+                let registration = await navigator.serviceWorker.register('/js/sw.js');
+            }else{
+                console.log('浏览器不支持!');
             }
+            window.addEventListener('beforeinstallprompt', (e) => {
+                console.log('接收到beforeinstallprompt!');
+                // 防止 Chrome 67 及更早版本自动显示安装提示
+                e.preventDefault();
+                // 稍后再触发此事件
+                window.deferredPrompt = e;
+                // 更新 UI 以提醒用户可以将 App 安装到桌面
+                // addBtn.style.display = 'block';
+
+                window.deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the A2HS prompt');
+                        } else {
+                        console.log('User dismissed the A2HS prompt');
+                        }
+                        window.deferredPrompt = null;
+                    });
+            });
+            window.addEventListener('appinstalled', () => {
+                // Log install to analytics
+                // console.log('INSTALL: Success');
+                fbq('track', 'SaveToDesk');
+            });
         });
     </script>
-</body>
+  </head>
+
+  <body>
+      <div class="game-container">
+        <div class="game-iframe">  
+          <iframe id="gameIframe" scrolling="no" ></iframe>
+          <div class="border">
+            <div class="home-icon-list">
+                <div class="bg-item">
+                    <div class="icon-item sc-item"></div>
+                    <span>Favorite</span>
+                </div>
+              
+                <!-- <a href="https://www.facebook.com/pokemonmega2" target="_blank">
+                    <div class="bg-item">
+                        <div class="icon-item fb-item"></div>
+                        <span>Facebook</span>
+                    </div>   
+                </a> -->
+                
+                <a href="https://discord.gg/EFaJ5rzXFK" target="_blank">
+                    <div class="bg-item">
+                        <div class="icon-item dis-item"></div>
+                        <span>Discord</span>
+                    </div>
+                </a>
+                <a href="mailto:support@forestgame.me" target="_blank">
+                    <div class="bg-item">
+                        <div class="icon-item su-item"></div>
+                        <span>Support</span>
+                    </div>
+                </a>
+
+                <a href="javascript:;" class="gift-item-a">
+                    <div class="bg-item " >
+                        <div class="icon-item gift-item"></div>
+                        <span class="gift-item-s">Gift</span>
+                    </div>
+                </a>
+                <a href="/new.html?id=33" target="_blank">
+                    <div class="bg-item">
+                        <div class="icon-item guide-item"></div>
+                        <span>Guide</span>
+                    </div>
+                </a>
+                <a href="javascript:;" class="user-item-a">
+                    <div class="bg-item">
+                        <div class="icon-item user-item"></div>
+                        <span class="user-item-s">User</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="home-news-list">
+                <div class="home-news-title">
+                    News
+                    <a href="news.html" target="_blank" class="home-news-more" >more>></a>
+                </div>
+                <div class="home-news" >
+                    <div class="noticeList">
+                        <ul id="homeNewsList">
+                        </ul>
+                    </div>
+                </div>
+                <div class="home-m-qrcode">
+                    <img src="/img/m-qrcode.png" alt="">
+                </div>
+            </div>
+
+            <div class="terms">
+                <a href="./terms.html" target="_blank">Terms of Service</a>
+                &
+                <a href="./privacy.html" target="_blank">Privacy Policy</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="to-desk-container" style="display: none;">
+        <div class="content pc-all" >
+            <div class="save"></div>
+            <div class="close"></div>
+        </div>
+      </div>
+      <div class="gift-container" style="display: none;">
+        <div class="gift-content">
+            <div class="gift-code-title">
+                <h1>Get gift code</h1>
+                <div class="gift-close"></div>
+            </div>
+            <div class="gift-form">
+                <img src="/img/box.png" />
+                <div class="gift-form-content">
+                    <label>
+                        <h2>Free Novice Pack for all new players</h2>
+                        <span>Get and Copy code, enter game to claim</span>
+                        <input id="giftCode" type="text" placeholder="Gift code number" />
+                    </label>
+                    <div class="gift-btn-line">
+                        <input type="button" class="giftButton" value="Get" />
+                        <i class="gift-msg"></i>
+                    </div>
+                </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </body>
+
+  <!-- Facebook Pixel Code -->
+<script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window,document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1518379505460224');
+    fbq('track', 'PageView');
+    </script>
+    <noscript>
+    <img height="1" width="1"
+    src="https://www.facebook.com/tr?id=1518379505460224&ev=PageView
+    &noscript=1"/>
+    </noscript>
+    <!-- End Facebook Pixel Code -->
+
 </html>
