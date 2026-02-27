@@ -33,7 +33,7 @@ def start_auto():
     driver = webdriver.Chrome(service=service, options=options)
     
    
-    driver.get("http://127.0.0.1:5500/index.html")
+    driver.get("http://127.0.0.1:5500/index.html")#chỉnh thành uid game web
     print("Đang đợi mở Form đăng nhập...")
 
     current_idx = 0
@@ -69,7 +69,7 @@ def start_auto():
             except:
                 pass
             
-            time.sleep(1)
+            time.sleep(0.1)
 
         print(" Đã điền hết danh sách tài khoản!")
 
@@ -79,4 +79,6 @@ def start_auto():
         print("Dừng tool.")
 
 if __name__ == "__main__":
+
     start_auto()
+#chạy kèm cả sikulix, 
